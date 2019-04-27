@@ -8,7 +8,7 @@
 
 'use strict';
 import React, {Component} from 'react';
-import {ScrollView, FlatList, View, StyleSheet, ViewPropTypes} from 'react-native';
+import {ScrollView, FlatList, View, StyleSheet, ViewPropTypes, Platform} from 'react-native';
 
 import PropTypes from 'prop-types';
 
@@ -22,6 +22,51 @@ const MIN_SCALE = 1;
 const MAX_SCALE = 3;
 
 const VIEWABILITYCONFIG = {minimumViewTime: 500, itemVisiblePercentThreshold: 10, waitForInteraction: false};
+
+
+const majorVersionIOS = parseInt(Platform.Version, 10);
+
+const CompatibleDoubleTapView = ({ onDoubleTap, onSingleTap, style, children }) => {
+    if (majorVersionIOS < 11) {
+        return (
+            <View style={style}>
+                {children}
+            </View>
+        )
+    }
+
+    return (
+        <DoubleTapView 
+            onDoubleTap={onDoubleTap} 
+            onSingleTap={onSingleTap} 
+            style={style}>
+            {children}
+        </DoubleTapView>
+    )
+};
+
+
+const CompatiblePinchZoomView = ({ onLayout, onScaleChanged, style, children }) => {
+    if (majorVersionIOS < 11) {
+        return (
+            <View 
+              style={style} 
+              onLayout={onLayout}
+              onScaleChanged={onScaleChanged} >
+                {children}
+            </View>
+        )
+    }
+
+    return (
+        <PinchZoomView 
+            onLayout={onLayout} 
+            onScaleChanged={onScaleChanged} 
+            style={style}>
+            {children}
+        </PinchZoomView>
+    )
+}
 
 export default class PdfView extends Component {
 
@@ -262,7 +307,7 @@ export default class PdfView extends Component {
     _renderItem = ({item, index}) => {
 
         return (
-            <DoubleTapView style={{flexDirection: this.props.horizontal ? 'row' : 'column'}}
+            <CompatibleDoubleTapView style={{flexDirection: this.props.horizontal ? 'row' : 'column'}}
                            onSingleTap={() => {
                                this._onItemSingleTap(index);
                            }}
@@ -279,7 +324,7 @@ export default class PdfView extends Component {
                     height={this._getPageHeight()}
                 />
                 {(index !== this.state.numberOfPages - 1) && this._renderSeparator()}
-            </DoubleTapView>
+            </CompatibleDoubleTapView>
         );
 
     };
@@ -371,13 +416,13 @@ export default class PdfView extends Component {
     render() {
 
         return (
-            <PinchZoomView
+            <CompatiblePinchZoomView
                 style={styles.container}
                 onLayout={this._onLayout}
                 onScaleChanged={this._onScaleChanged}
             >
                 {this.state.pdfLoaded && this._renderList()}
-            </PinchZoomView>
+            </CompatiblePinchZoomView>
         );
 
     }
