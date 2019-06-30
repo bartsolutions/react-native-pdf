@@ -214,6 +214,7 @@ const float MIN_SCALE = 1.0f;
         if (_pdfDocument && ([changedProps containsObject:@"path"] || [changedProps containsObject:@"enablePaging"])) {
             if (_enablePaging) {
                 [_pdfView usePageViewController:YES withViewOptions:@{UIPageViewControllerOptionSpineLocationKey:@(UIPageViewControllerSpineLocationMin),UIPageViewControllerOptionInterPageSpacingKey:@(_spacing)}];
+                [_pdfView setBackgroundColor:[UIColor blackColor]];
             } else {
                 [_pdfView usePageViewController:NO withViewOptions:Nil];
             }
